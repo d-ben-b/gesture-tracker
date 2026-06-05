@@ -45,7 +45,7 @@ while cap.isOpened():
         color = (255, 165, 0)  
     elif smoothed_status in ["T-POSE DOMINANCE!", "DAB ON EM!"]:
         color = (0, 255, 255) 
-    elif smoothed_status == "114514":
+    elif smoothed_status == "YAJUSENPAI!!!":
         color = (255, 0, 255)
     elif smoothed_status == "KILLER QUEEN!":
         color = (203, 150, 255)
