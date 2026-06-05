@@ -24,26 +24,41 @@ class ActionRule:
 
 class BeastRule(ActionRule):
     """
-    114514
+    YAJUSENPAI!!!
     """
     def __init__(self):
-        super().__init__("114514")
+        super().__init__("YAJUSENPAI!!!")
 
     def check(self, kp):
         nose = kp[NOSE]
         l_sh, r_sh = kp[L_SHOULDER], kp[R_SHOULDER]
         l_wr, r_wr = kp[L_WRIST], kp[R_WRIST]
 
-        # 計算雙手手腕與鼻子的距離
+        # 1. 取得兩肩的動態寬度，作為量測的動態標準
+        shoulder_width = abs(l_sh[0] - r_sh[0])
+        
+        # 避免除以零或關節點重疊的極端錯誤
+        if shoulder_width == 0:
+            return False
+
+        # 2. 計算手腕與鼻子的實際距離
         dist_l_nose = math.hypot(l_wr[0] - nose[0], l_wr[1] - nose[1])
         dist_r_nose = math.hypot(r_wr[0] - nose[0], r_wr[1] - nose[1])
 
-        # 判斷條件：
-        # 1. 雙手手腕都在頭部附近（距離鼻子 < 100 像素）
-        # 2. 雙手手腕的 Y 座標都高於肩膀（Y 值越小代表越高）
-        if dist_l_nose < 100 and dist_r_nose < 100 and l_wr[1] < l_sh[1] and r_wr[1] < r_sh[1]:
-            return True
-        return False
+        # 3. 判斷 A：手腕是否高於肩膀 (在影像中，Y 座標越小代表越高)
+        wrists_above = (l_wr[1] < l_sh[1]) and (r_wr[1] < r_sh[1])
+
+        # 4. 判斷 B：手腕是否在兩肩內側 (X 座標介於左肩與右肩之間)
+        # 使用 min 和 max 可以無視畫面是否經過鏡像翻轉
+        left_bound = min(l_sh[0], r_sh[0])
+        right_bound = max(l_sh[0], r_sh[0])
+        wrists_inside = (left_bound < l_wr[0] < right_bound) and (left_bound < r_wr[0] < right_bound)
+
+        # 5. 判斷 C：手腕靠近頭部 (距離小於肩寬的 0.8 倍，徹底拔除絕對像素)
+        close_to_head = (dist_l_nose < shoulder_width * 0.8) and (dist_r_nose < shoulder_width * 0.8)
+
+        # 必須同時滿足上述三個相對條件，才算成功發動 114514
+        return wrists_above and wrists_inside and close_to_head
     
 class KillerQueenRule(ActionRule):
     """
